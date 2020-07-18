@@ -1,0 +1,49 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red26\green26\blue26;\red239\green239\blue239;}
+{\*\expandedcolortbl;;\cssrgb\c13333\c13333\c13333;\cssrgb\c94902\c94902\c94902;}
+\margl1440\margr1440\vieww15160\viewh14240\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 You will need to be able to SSH over to my local server unless you can do all of this locally.\
+\
+Project Description:\
+\
+I gather data from twitter.  The thought is to run a script, in this case we decided to go with Spark implemented in Java.  The Spark app will process a whole list of text files with delimited by \'91^\'92 and the last value is the twitter comment.  The Spark Java application takes the comments,  and compares each word in that comments against a file called AFINNcsv.txt.  AFINNcsv.txt contains words with a value that is either positive or negative.  So the Spark Java app takes each comments uses AFINNcsv.txt to score each word within the comments and would return either a positive or negative value for that entire comment. Basically this scores a comment of either negative or positive comment.\
+\
+Right now the spark app takes one parameter delimited by \'91^\'94: cdnpolitics^justintrudeau^khadr\
+\
+first value is the \'93context\'94 value.  The second value is considered the subject.  Basically this will weight the comments base on the context \'93cdnpolitics\'94 and subject is kjustintrudeau and it is about khadr.\
+\
+the Context is basically a directory name in the server that contains all of the text file with the twitter feeds.  \
+\
+The results to be saved in MongoDB is this:\
+\pard\pardeftab720\sl300\partightenfactor0
+
+\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+db.twitter.find()\{ "_id" : ObjectId("597f64b34d6e5e5104113d54"), "context" : "cdnpolitics", "subject:" : "justintrudeau", "totalTweets" : NumberLong(1419), "positiveTweets" : NumberLong(138), "negativeTweets" : NumberLong(295), "topics" : [ \{ "jobs" : 22 \}, \{ "economy" : 357 \}, \{ "kinder" : 272 \} ] \}
+\fs24 \cf0 \cb1 \kerning1\expnd0\expndtw0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab720\sl300\partightenfactor0
+
+\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+ON LOCAL MONGO\cb1 \
+\cb3 I created a database social, with two collections:\cb1 \
+\cb3 - reference\cb1 \
+\cb3 - twitter\
+so here is the content for reference for now\
+\{ "_id" : ObjectId("597f2e03d4f64c2fcb3d178e"), "context" : "cdnpolitics", "topics" : [ "jobs", "economy", "kinder" ] \}\cb1 \
+\cb3 \
+the topics of the politics context\
+then in my code, I passed the args\cb1 \
+\cb3 context subject inputPath\
+I search for topics in the reference collection, in the document with the given context\cb1 \
+\cb3 here jobs, economy and kinder\
+then I count the occurrence of each topic, I also count the number of positive and negative tweets\
+and save to twitter the new document\cb1 \
+\cb3 \
+the document I created is\cb1 \
+\cb3 \
+db.twitter.find()\{ "_id" : ObjectId("597f64b34d6e5e5104113d54"), "context" : "cdnpolitics", "subject:" : "justintrudeau", "totalTweets" : NumberLong(1419), "positiveTweets" : NumberLong(138), "negativeTweets" : NumberLong(295), "topics" : [ \{ "jobs" : 22 \}, \{ "economy" : 357 \}, \{ "kinder" : 272 \} ] \}}
